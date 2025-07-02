@@ -1,6 +1,9 @@
 import { Client, Events, Interaction, SlashCommandBuilder } from "discord.js";
-import { commands, handleCommand } from "./reactionRole/commands";
-import ReactionRole from "@models/role";
+import {
+  commands,
+  handleCommand,
+} from "@/modules/reactionRole/commandsHandler";
+import ReactionRole from "@/modules/reactionRole/models/role";
 
 const GUILD_ID = process.env.GUILD_ID;
 const NODE_ENV = process.env.NODE_ENV;

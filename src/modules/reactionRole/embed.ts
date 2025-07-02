@@ -1,6 +1,6 @@
 import { EmbedBuilder, Guild, TextChannel, Client } from "discord.js";
-import { IReactionRole } from "@models/role";
-import ReactionRoleMessage from "@models/roleMessage";
+import { IReactionRole } from "@/modules/reactionRole/models/role";
+import ReactionRoleMessage from "@/modules/reactionRole/models/roleMessage";
 
 export async function buildReactionRoleEmbed(
   roles: IReactionRole[],
@@ -60,7 +60,7 @@ export async function upsertReactionRoleEmbed(
     }
   }
   const roles = await (
-    await import("./model/role")
+    await import("./models/role")
   ).default.find({ guildId, channelId: channel.id });
   const embed = await buildReactionRoleEmbed(roles, guild, rrMsg || undefined);
   if (rrMsg && rrMsg.messageId) {

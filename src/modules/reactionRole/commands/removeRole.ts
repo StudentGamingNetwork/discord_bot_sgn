@@ -5,10 +5,10 @@ import {
   GuildMember,
   TextChannel,
 } from "discord.js";
-import ReactionRole from "@models/role";
-import { isAuthorized } from "../permission";
-import ReactionRoleMessage from "@models/roleMessage";
-import { upsertReactionRoleEmbed } from "../embed";
+import ReactionRole from "@/modules/reactionRole/models/role";
+import { isAuthorized } from "@/modules/reactionRole/permission";
+import ReactionRoleMessage from "@/modules/reactionRole/models/roleMessage";
+import { upsertReactionRoleEmbed } from "@/modules/reactionRole/embed";
 
 export const removeRoleCommand = new SlashCommandBuilder()
   .setName("removerole")
