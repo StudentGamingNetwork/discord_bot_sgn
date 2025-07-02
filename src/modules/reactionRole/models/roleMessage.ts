@@ -11,7 +11,7 @@ export interface IReactionRoleMessage extends Document {
 const ReactionRoleMessageSchema = new Schema<IReactionRoleMessage>({
   guildId: { type: String, required: true },
   channelId: { type: String, required: true },
-  messageId: { type: String, required: true },
+  messageId: { type: String, required: false },
   title: { type: String },
   description: { type: String },
 });
