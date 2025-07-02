@@ -5,9 +5,9 @@ import {
   GuildMember,
   TextChannel,
 } from "discord.js";
-import ReactionRoleMessage from "@models/reactionRoleMessage";
-import ReactionRole from "@models/reactionRole";
-import { isAuthorized } from "../permission";
+import ReactionRoleMessage from "@/modules/reactionRole/models/roleMessage";
+import ReactionRole from "@/modules/reactionRole/models/role";
+import { isAuthorized } from "@/modules/reactionRole/permission";
 
 export const removeReactionRolesCommand = new SlashCommandBuilder()
   .setName("removereactionroles")

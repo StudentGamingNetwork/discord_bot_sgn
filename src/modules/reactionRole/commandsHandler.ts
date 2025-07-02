@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client } from "discord.js";
-import { commands, handlers } from "./commands/index";
+import { commands, handlers } from "@/modules/reactionRole/commands";
 
 export async function handleCommand(
   interaction: ChatInputCommandInteraction,

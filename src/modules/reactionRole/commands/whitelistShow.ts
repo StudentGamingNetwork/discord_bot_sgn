@@ -4,8 +4,8 @@ import {
   Client,
   GuildMember,
 } from "discord.js";
-import Whitelist from "@models/whitelist";
-import { isAuthorized } from "../permission";
+import Whitelist from "@/modules/reactionRole/models/whitelist";
+import { isAuthorized } from "@/modules/reactionRole/permission";
 
 export const whitelistShowCommand = new SlashCommandBuilder()
   .setName("whitelistshow")

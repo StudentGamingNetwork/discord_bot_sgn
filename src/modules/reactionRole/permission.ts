@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import Whitelist from "@models/whitelist";
+import Whitelist from "@/modules/reactionRole/models/whitelist";
 
 export async function isAuthorized(member: GuildMember): Promise<boolean> {
   const guildId = member.guild.id;

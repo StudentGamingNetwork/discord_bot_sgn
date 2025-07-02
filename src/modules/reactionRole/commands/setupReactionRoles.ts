@@ -5,9 +5,9 @@ import {
   GuildMember,
   TextChannel,
 } from "discord.js";
-import ReactionRoleMessage from "@models/roleMessage";
-import { upsertReactionRoleEmbed } from "../embed";
-import { isAuthorized } from "../permission";
+import ReactionRoleMessage from "@/modules/reactionRole/models/roleMessage";
+import { upsertReactionRoleEmbed } from "@/modules/reactionRole/embed";
+import { isAuthorized } from "@/modules/reactionRole/permission";
 
 export const setupReactionRolesCommand = new SlashCommandBuilder()
   .setName("setupreactionroles")
