@@ -8,12 +8,17 @@ import {
 import { whitelistUserCommand, handleWhitelistUser } from "./whitelistUser";
 import { whitelistRoleCommand, handleWhitelistRole } from "./whitelistRole";
 import { whitelistShowCommand, handleWhitelistShow } from "./whitelistShow";
+import {
+  removeReactionRolesCommand,
+  handleRemoveReactionRoles,
+} from "./removeReactionRoles";
 
 export const commands = [
   addRoleCommand,
   removeRoleCommand,
   editRoleCommand,
   setupReactionRolesCommand,
+  removeReactionRolesCommand,
   whitelistUserCommand,
   whitelistRoleCommand,
   whitelistShowCommand,
@@ -24,6 +29,7 @@ export const handlers: Record<string, any> = {
   removerole: handleRemoveRole,
   editrole: handleEditRole,
   setupreactionroles: handleSetupReactionRoles,
+  removereactionroles: handleRemoveReactionRoles,
   whitelistuser: handleWhitelistUser,
   whitelistrole: handleWhitelistRole,
   whitelistshow: handleWhitelistShow,
