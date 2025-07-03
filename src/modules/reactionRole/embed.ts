@@ -71,6 +71,14 @@ export async function upsertReactionRoleEmbed(
       for (const role of roles) {
         await msg.react(role.emoji);
       }
+      const ReactionRole = (await import("./models/role")).default;
+      await ReactionRole.updateMany(
+        { guildId, channelId: channel.id },
+        { $set: { messageId: rrMsg.messageId } }
+      );
+      console.log(
+        `[DEBUG][upsertReactionRoleEmbed] Tous les ReactionRole du salon ${channel.id} mis à jour avec messageId=${rrMsg.messageId}`
+      );
     } catch (e) {
       const newMsg = await channel.send({ embeds: [embed] });
       rrMsg.messageId = newMsg.id;
@@ -78,6 +86,14 @@ export async function upsertReactionRoleEmbed(
       for (const role of roles) {
         await newMsg.react(role.emoji);
       }
+      const ReactionRole = (await import("./models/role")).default;
+      await ReactionRole.updateMany(
+        { guildId, channelId: channel.id },
+        { $set: { messageId: rrMsg.messageId } }
+      );
+      console.log(
+        `[DEBUG][upsertReactionRoleEmbed] Tous les ReactionRole du salon ${channel.id} mis à jour avec messageId=${rrMsg.messageId}`
+      );
     }
   } else {
     const msg = await channel.send({ embeds: [embed] });
@@ -96,5 +112,13 @@ export async function upsertReactionRoleEmbed(
     for (const role of roles) {
       await msg.react(role.emoji);
     }
+    const ReactionRole = (await import("./models/role")).default;
+    await ReactionRole.updateMany(
+      { guildId, channelId: channel.id },
+      { $set: { messageId: msg.id } }
+    );
+    console.log(
+      `[DEBUG][upsertReactionRoleEmbed] Tous les ReactionRole du salon ${channel.id} mis à jour avec messageId=${msg.id}`
+    );
   }
 }
