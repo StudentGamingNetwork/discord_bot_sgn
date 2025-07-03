@@ -59,21 +59,19 @@ export async function handleRemoveRole(
     flags: 64,
   });
 
-  // Mettre à jour l'embed
   const rrMsg = await ReactionRoleMessage.findOne({ guildId, channelId });
   let channel = interaction.channel;
   if (!channel && rrMsg) {
     channel = (await client.channels.fetch(rrMsg.channelId)) as TextChannel;
   }
-  if (channel && channel.isTextBased() && channel.type === 0) {
-    await upsertReactionRoleEmbed(
-      client,
-      guildId,
-      channel as TextChannel,
-      interaction.guild!
-    );
-    console.log(
-      `[DEBUG][removeRole] Embed mis à jour dans le salon ${channel.id}`
-    );
-  }
+  if (!channel || !channel.isTextBased() || channel.type !== 0) return;
+  await upsertReactionRoleEmbed(
+    client,
+    guildId,
+    channel as TextChannel,
+    interaction.guild!
+  );
+  console.log(
+    `[DEBUG][removeRole] Embed mis à jour dans le salon ${channel.id}`
+  );
 }

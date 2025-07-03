@@ -64,16 +64,15 @@ export async function handleAddRole(
     isUnicode = true;
     isValidEmoji = true;
     emojiToStore = emoji;
-  } else if (customEmojiRegex.test(emoji)) {
+  }
+  if (!isValidEmoji && customEmojiRegex.test(emoji) && interaction.guild) {
     const match = emoji.match(customEmojiRegex);
-    if (match && interaction.guild) {
-      const [, name, id] = match;
-      const found = interaction.guild.emojis.cache.get(id);
-      if (found) {
-        isValidEmoji = true;
-        customEmojiId = id;
-        emojiToStore = id; // On stocke l'id pour les custom
-      }
+    const [, , id] = match || [];
+    const found = id ? interaction.guild.emojis.cache.get(id) : null;
+    if (found) {
+      isValidEmoji = true;
+      customEmojiId = id;
+      emojiToStore = id;
     }
   }
   if (!isValidEmoji) {
@@ -86,7 +85,6 @@ export async function handleAddRole(
     return;
   }
 
-  // Vérifier si le rôle ou l'emoji existe déjà dans ce channel
   const exists = await ReactionRole.findOne({
     guildId,
     channelId,
@@ -117,21 +115,17 @@ export async function handleAddRole(
     flags: 64,
   });
 
-  // Mettre à jour l'embed
   const rrMsg = await ReactionRoleMessage.findOne({ guildId, channelId });
   let channel = interaction.channel;
   if (!channel && rrMsg) {
     channel = (await client.channels.fetch(rrMsg.channelId)) as TextChannel;
   }
-  if (channel && channel.isTextBased() && channel.type === 0) {
-    await upsertReactionRoleEmbed(
-      client,
-      guildId,
-      channel as TextChannel,
-      interaction.guild!
-    );
-    console.log(
-      `[DEBUG][addRole] Embed mis à jour dans le salon ${channel.id}`
-    );
-  }
+  if (!channel || !channel.isTextBased() || channel.type !== 0) return;
+  await upsertReactionRoleEmbed(
+    client,
+    guildId,
+    channel as TextChannel,
+    interaction.guild!
+  );
+  console.log(`[DEBUG][addRole] Embed mis à jour dans le salon ${channel.id}`);
 }
