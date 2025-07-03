@@ -40,11 +40,10 @@ export = (client: Client) => {
   client.on(Events.MessageReactionAdd, async (reaction, user, _details) => {
     if (user.bot) return;
     try {
-      // Gérer les partials
       if (reaction.partial) await reaction.fetch();
       if (user.partial) await user.fetch();
       console.log(
-        `[DEBUG][ReactionAdd] Réaction détectée : messageId=${reaction.message.id}, emoji=${reaction.emoji.name}, user=${user.tag}`
+        `[DEBUG][ReactionAdd] Réaction détectée : messageId=${reaction.message.id}, emoji=${reaction.emoji.name}, emojiId=${reaction.emoji.id}, user=${user.tag}`
       );
       const member = await reaction.message.guild?.members.fetch(user.id);
       if (!member) {
@@ -53,11 +52,23 @@ export = (client: Client) => {
         );
         return;
       }
-      const rr = await ReactionRole.findOne({
-        guildId: reaction.message.guildId,
-        messageId: reaction.message.id,
-        emoji: reaction.emoji.name,
-      });
+      // Recherche selon le type d'emoji
+      let rr = null;
+      if (reaction.emoji.id) {
+        // Emoji custom : on compare l'id
+        rr = await ReactionRole.findOne({
+          guildId: reaction.message.guildId,
+          messageId: reaction.message.id,
+          emoji: reaction.emoji.id,
+        });
+      } else {
+        // Emoji unicode : on compare le nom
+        rr = await ReactionRole.findOne({
+          guildId: reaction.message.guildId,
+          messageId: reaction.message.id,
+          emoji: reaction.emoji.name,
+        });
+      }
       if (rr) {
         try {
           await member.roles.add(rr.roleId);
@@ -85,7 +96,7 @@ export = (client: Client) => {
       if (reaction.partial) await reaction.fetch();
       if (user.partial) await user.fetch();
       console.log(
-        `[DEBUG][ReactionRemove] Réaction retirée : messageId=${reaction.message.id}, emoji=${reaction.emoji.name}, user=${user.tag}`
+        `[DEBUG][ReactionRemove] Réaction retirée : messageId=${reaction.message.id}, emoji=${reaction.emoji.name}, emojiId=${reaction.emoji.id}, user=${user.tag}`
       );
       const member = await reaction.message.guild?.members.fetch(user.id);
       if (!member) {
@@ -94,11 +105,23 @@ export = (client: Client) => {
         );
         return;
       }
-      const rr = await ReactionRole.findOne({
-        guildId: reaction.message.guildId,
-        messageId: reaction.message.id,
-        emoji: reaction.emoji.name,
-      });
+      // Recherche selon le type d'emoji
+      let rr = null;
+      if (reaction.emoji.id) {
+        // Emoji custom : on compare l'id
+        rr = await ReactionRole.findOne({
+          guildId: reaction.message.guildId,
+          messageId: reaction.message.id,
+          emoji: reaction.emoji.id,
+        });
+      } else {
+        // Emoji unicode : on compare le nom
+        rr = await ReactionRole.findOne({
+          guildId: reaction.message.guildId,
+          messageId: reaction.message.id,
+          emoji: reaction.emoji.name,
+        });
+      }
       if (rr) {
         try {
           await member.roles.remove(rr.roleId);

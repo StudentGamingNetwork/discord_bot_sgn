@@ -53,19 +53,28 @@ export async function handleAddRole(
     `[DEBUG][addRole] Paramètres reçus : emoji='${emoji}', role='${role.name}', description='${description}'`
   );
 
-  // Vérification de l'emoji : doit être un emoji unicode ou un emoji custom du serveur
+  // Gestion avancée de l'emoji : unicode ou custom Discord
+  let emojiToStore = emoji;
+  let isValidEmoji = false;
+  let isUnicode = false;
+  let customEmojiId = null;
+  const customEmojiRegex = /^<a?:([\w~]+):(\d+)>$/;
   const unicodeEmojiRegex = /^(?:\p{Emoji}|\p{Extended_Pictographic})+$/u;
-  const isUnicode = unicodeEmojiRegex.test(emoji);
-  const guildEmojis = interaction.guild?.emojis.cache;
-  let isValidEmoji = isUnicode;
-  if (!isUnicode && guildEmojis) {
-    // Vérifie si l'emoji custom existe sur le serveur
-    isValidEmoji = guildEmojis.some(
-      (e) =>
-        `<:${e.name}:${e.id}>` === emoji ||
-        `<a:${e.name}:${e.id}>` === emoji ||
-        e.identifier === emoji.replace(/<a?:|>/g, "")
-    );
+  if (unicodeEmojiRegex.test(emoji)) {
+    isUnicode = true;
+    isValidEmoji = true;
+    emojiToStore = emoji;
+  } else if (customEmojiRegex.test(emoji)) {
+    const match = emoji.match(customEmojiRegex);
+    if (match && interaction.guild) {
+      const [, name, id] = match;
+      const found = interaction.guild.emojis.cache.get(id);
+      if (found) {
+        isValidEmoji = true;
+        customEmojiId = id;
+        emojiToStore = id; // On stocke l'id pour les custom
+      }
+    }
   }
   if (!isValidEmoji) {
     console.warn(`[DEBUG][addRole] Emoji invalide : '${emoji}'`);
@@ -81,7 +90,7 @@ export async function handleAddRole(
   const exists = await ReactionRole.findOne({
     guildId,
     channelId,
-    $or: [{ roleId: role.id }, { emoji: emoji }],
+    $or: [{ roleId: role.id }, { emoji: emojiToStore }],
   });
   if (exists) {
     console.warn(`[DEBUG][addRole] Rôle ou emoji déjà existant dans ce salon.`);
@@ -95,7 +104,7 @@ export async function handleAddRole(
   await ReactionRole.create({
     guildId,
     channelId,
-    emoji,
+    emoji: emojiToStore,
     roleId: role.id,
     description,
     messageId: "",

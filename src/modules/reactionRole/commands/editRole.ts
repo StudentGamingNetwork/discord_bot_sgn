@@ -74,18 +74,28 @@ export async function handleEditRole(
     return;
   }
   if (emoji) {
-    // Vérification de l'emoji : doit être un emoji unicode ou un emoji custom du serveur
+    // Gestion avancée de l'emoji : unicode ou custom Discord
+    let emojiToStore = emoji;
+    let isValidEmoji = false;
+    let isUnicode = false;
+    let customEmojiId = null;
+    const customEmojiRegex = /^<a?:([\w~]+):(\d+)>$/;
     const unicodeEmojiRegex = /^(?:\p{Emoji}|\p{Extended_Pictographic})+$/u;
-    const isUnicode = unicodeEmojiRegex.test(emoji);
-    const guildEmojis = interaction.guild?.emojis.cache;
-    let isValidEmoji = isUnicode;
-    if (!isUnicode && guildEmojis) {
-      isValidEmoji = guildEmojis.some(
-        (e) =>
-          `<:${e.name}:${e.id}>` === emoji ||
-          `<a:${e.name}:${e.id}>` === emoji ||
-          e.identifier === emoji.replace(/<a?:|>/g, "")
-      );
+    if (unicodeEmojiRegex.test(emoji)) {
+      isUnicode = true;
+      isValidEmoji = true;
+      emojiToStore = emoji;
+    } else if (customEmojiRegex.test(emoji)) {
+      const match = emoji.match(customEmojiRegex);
+      if (match && interaction.guild) {
+        const [, name, id] = match;
+        const found = interaction.guild.emojis.cache.get(id);
+        if (found) {
+          isValidEmoji = true;
+          customEmojiId = id;
+          emojiToStore = id; // On stocke l'id pour les custom
+        }
+      }
     }
     if (!isValidEmoji) {
       console.warn(`[DEBUG][editRole] Emoji invalide : '${emoji}'`);
@@ -96,7 +106,7 @@ export async function handleEditRole(
       });
       return;
     }
-    rr.emoji = emoji;
+    rr.emoji = emojiToStore;
   }
   if (description !== null && description !== undefined)
     rr.description = description;
