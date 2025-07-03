@@ -31,7 +31,13 @@ export async function handleAddRole(
   client: Client
 ) {
   const member = interaction.member as GuildMember;
+  console.log(
+    `[DEBUG][addRole] Commande reçue par ${interaction.user.tag} (ID: ${interaction.user.id}) dans le salon ${interaction.channelId}`
+  );
   if (!isAuthorized(member)) {
+    console.warn(
+      `[DEBUG][addRole] Permission refusée pour ${interaction.user.tag}`
+    );
     await interaction.reply({
       content: "⛔ Vous n'avez pas la permission.",
       flags: 64,
@@ -43,6 +49,9 @@ export async function handleAddRole(
   const description = interaction.options.getString("description") || "";
   const guildId = interaction.guildId!;
   const channelId = interaction.channelId;
+  console.log(
+    `[DEBUG][addRole] Paramètres reçus : emoji='${emoji}', role='${role.name}', description='${description}'`
+  );
 
   // Vérification de l'emoji : doit être un emoji unicode ou un emoji custom du serveur
   const unicodeEmojiRegex = /^(?:\p{Emoji}|\p{Extended_Pictographic})+$/u;
@@ -59,6 +68,7 @@ export async function handleAddRole(
     );
   }
   if (!isValidEmoji) {
+    console.warn(`[DEBUG][addRole] Emoji invalide : '${emoji}'`);
     await interaction.reply({
       content:
         "⛔ L'emoji doit être un emoji unicode ou un emoji custom du serveur.",
@@ -74,6 +84,7 @@ export async function handleAddRole(
     $or: [{ roleId: role.id }, { emoji: emoji }],
   });
   if (exists) {
+    console.warn(`[DEBUG][addRole] Rôle ou emoji déjà existant dans ce salon.`);
     await interaction.reply({
       content: "⛔ Ce rôle ou cet emoji est déjà dans la liste.",
       flags: 64,
@@ -89,6 +100,9 @@ export async function handleAddRole(
     description,
     messageId: "",
   });
+  console.log(
+    `[DEBUG][addRole] Rôle ajouté avec succès : ${emoji} - ${role.name}`
+  );
   await interaction.reply({
     content: `✅ Rôle ajouté : ${emoji} - ${role.name}`,
     flags: 64,
@@ -106,6 +120,9 @@ export async function handleAddRole(
       guildId,
       channel as TextChannel,
       interaction.guild!
+    );
+    console.log(
+      `[DEBUG][addRole] Embed mis à jour dans le salon ${channel.id}`
     );
   }
 }

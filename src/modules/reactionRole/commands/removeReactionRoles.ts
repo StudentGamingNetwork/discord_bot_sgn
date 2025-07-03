@@ -18,7 +18,13 @@ export async function handleRemoveReactionRoles(
   client: Client
 ) {
   const member = interaction.member as GuildMember;
+  console.log(
+    `[DEBUG][removeReactionRoles] Commande reçue par ${interaction.user.tag} (ID: ${interaction.user.id}) dans le salon ${interaction.channelId}`
+  );
   if (!(await isAuthorized(member))) {
+    console.warn(
+      `[DEBUG][removeReactionRoles] Permission refusée pour ${interaction.user.tag}`
+    );
     await interaction.reply({
       content: "⛔ Vous n'avez pas la permission.",
       flags: 64,
@@ -29,6 +35,9 @@ export async function handleRemoveReactionRoles(
   const channelId = interaction.channelId;
   const rrMsg = await ReactionRoleMessage.findOne({ guildId, channelId });
   if (!rrMsg) {
+    console.warn(
+      `[DEBUG][removeReactionRoles] Aucun embed à supprimer dans ce salon.`
+    );
     await interaction.reply({
       content: "Aucun embed de rôles à réaction à supprimer dans ce salon.",
       flags: 64,
@@ -45,10 +54,20 @@ export async function handleRemoveReactionRoles(
         rrMsg.messageId
       );
       await msg.delete();
-    } catch (e) {}
+      console.log(
+        `[DEBUG][removeReactionRoles] Message d'embed supprimé dans le salon ${channel.id}`
+      );
+    } catch (e) {
+      console.warn(
+        `[DEBUG][removeReactionRoles] Impossible de supprimer le message d'embed : ${e}`
+      );
+    }
   }
   await ReactionRoleMessage.deleteOne({ guildId, channelId });
   await ReactionRole.deleteMany({ guildId, channelId });
+  console.log(
+    `[DEBUG][removeReactionRoles] Embed et rôles supprimés pour le salon ${channelId}`
+  );
   await interaction.reply({
     content: "Embed de rôles à réaction supprimé du salon.",
     flags: 64,

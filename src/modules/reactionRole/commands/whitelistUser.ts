@@ -41,7 +41,13 @@ export async function handleWhitelistUser(
   client: Client
 ) {
   const member = interaction.member as GuildMember;
+  console.log(
+    `[DEBUG][whitelistUser] Commande reçue par ${interaction.user.tag} (ID: ${interaction.user.id}) dans le salon ${interaction.channelId}`
+  );
   if (!(await isAuthorized(member))) {
+    console.warn(
+      `[DEBUG][whitelistUser] Permission refusée pour ${interaction.user.tag}`
+    );
     await interaction.reply({
       content: "⛔ Vous n'avez pas la permission.",
       flags: 64,
@@ -55,7 +61,13 @@ export async function handleWhitelistUser(
     const user = interaction.options.getUser(`user${i}`);
     if (user) userIds.push(user.id);
   }
+  console.log(
+    `[DEBUG][whitelistUser] Paramètres reçus : action='${action}', userIds=[${userIds.join(
+      ", "
+    )}]`
+  );
   if (userIds.length === 0) {
+    console.warn(`[DEBUG][whitelistUser] Aucun utilisateur spécifié.`);
     await interaction.reply({
       content: "Aucun utilisateur spécifié.",
       flags: 64,
@@ -72,6 +84,9 @@ export async function handleWhitelistUser(
     whitelist.userIds = whitelist.userIds.filter((id) => !userIds.includes(id));
   }
   await whitelist.save();
+  console.log(
+    `[DEBUG][whitelistUser] Whitelist mise à jour pour le serveur ${guildId}`
+  );
   await interaction.reply({
     content: `✅ Utilisateurs ${
       action === "add" ? "ajoutés à" : "retirés de"

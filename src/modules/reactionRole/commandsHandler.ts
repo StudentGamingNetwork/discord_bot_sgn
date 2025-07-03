@@ -6,8 +6,15 @@ export async function handleCommand(
   client: Client
 ) {
   const handler = handlers[interaction.commandName];
+  console.log(
+    `[DEBUG] Commande reçue : ${interaction.commandName} par ${interaction.user.tag}`
+  );
   if (handler) {
     await handler(interaction, client);
+  } else {
+    console.warn(
+      `[DEBUG] Aucun handler trouvé pour la commande : ${interaction.commandName}`
+    );
   }
 }
 

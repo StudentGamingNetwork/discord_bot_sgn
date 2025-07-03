@@ -31,7 +31,13 @@ export async function handleEditRole(
   client: Client
 ) {
   const member = interaction.member as GuildMember;
+  console.log(
+    `[DEBUG][editRole] Commande reçue par ${interaction.user.tag} (ID: ${interaction.user.id}) dans le salon ${interaction.channelId}`
+  );
   if (!isAuthorized(member)) {
+    console.warn(
+      `[DEBUG][editRole] Permission refusée pour ${interaction.user.tag}`
+    );
     await interaction.reply({
       content: "⛔ Vous n'avez pas la permission.",
       flags: 64,
@@ -43,13 +49,16 @@ export async function handleEditRole(
   const description = interaction.options.getString("description");
   const guildId = interaction.guildId!;
   const channelId = interaction.channelId;
-
+  console.log(
+    `[DEBUG][editRole] Paramètres reçus : role='${role.name}', emoji='${emoji}', description='${description}'`
+  );
   const rr = await ReactionRole.findOne({
     guildId,
     channelId,
     roleId: role.id,
   });
   if (!rr) {
+    console.warn(`[DEBUG][editRole] Rôle non trouvé dans la liste.`);
     await interaction.reply({
       content: "⛔ Ce rôle n'existe pas dans la liste.",
       flags: 64,
@@ -57,6 +66,7 @@ export async function handleEditRole(
     return;
   }
   if (!emoji && !description) {
+    console.warn(`[DEBUG][editRole] Aucun attribut à modifier spécifié.`);
     await interaction.reply({
       content: "Veuillez spécifier au moins un attribut à modifier.",
       flags: 64,
@@ -78,6 +88,7 @@ export async function handleEditRole(
       );
     }
     if (!isValidEmoji) {
+      console.warn(`[DEBUG][editRole] Emoji invalide : '${emoji}'`);
       await interaction.reply({
         content:
           "⛔ L'emoji doit être un emoji unicode ou un emoji custom du serveur.",
@@ -90,6 +101,7 @@ export async function handleEditRole(
   if (description !== null && description !== undefined)
     rr.description = description;
   await rr.save();
+  console.log(`[DEBUG][editRole] Rôle modifié avec succès : ${role.name}`);
   await interaction.reply({
     content: `✏️ Rôle modifié : ${emoji ? `emoji = ${emoji}` : ""}${
       emoji && description ? ", " : ""
@@ -109,6 +121,9 @@ export async function handleEditRole(
       guildId,
       channel as TextChannel,
       interaction.guild!
+    );
+    console.log(
+      `[DEBUG][editRole] Embed mis à jour dans le salon ${channel.id}`
     );
   }
 }

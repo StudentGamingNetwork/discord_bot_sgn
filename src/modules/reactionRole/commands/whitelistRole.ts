@@ -42,7 +42,13 @@ export async function handleWhitelistRole(
   client: Client
 ) {
   const member = interaction.member as GuildMember;
+  console.log(
+    `[DEBUG][whitelistRole] Commande reçue par ${interaction.user.tag} (ID: ${interaction.user.id}) dans le salon ${interaction.channelId}`
+  );
   if (!(await isAuthorized(member))) {
+    console.warn(
+      `[DEBUG][whitelistRole] Permission refusée pour ${interaction.user.tag}`
+    );
     await interaction.reply({
       content: "⛔ Vous n'avez pas la permission.",
       flags: 64,
@@ -56,7 +62,13 @@ export async function handleWhitelistRole(
     const role = interaction.options.getRole(`role${i}`);
     if (role) roleIds.push(role.id);
   }
+  console.log(
+    `[DEBUG][whitelistRole] Paramètres reçus : action='${action}', roleIds=[${roleIds.join(
+      ", "
+    )}]`
+  );
   if (roleIds.length === 0) {
+    console.warn(`[DEBUG][whitelistRole] Aucun rôle spécifié.`);
     await interaction.reply({ content: "Aucun rôle spécifié.", flags: 64 });
     return;
   }
@@ -70,6 +82,9 @@ export async function handleWhitelistRole(
     whitelist.roleIds = whitelist.roleIds.filter((id) => !roleIds.includes(id));
   }
   await whitelist.save();
+  console.log(
+    `[DEBUG][whitelistRole] Whitelist mise à jour pour le serveur ${guildId}`
+  );
   await interaction.reply({
     content: `✅ Rôles ${
       action === "add" ? "ajoutés à" : "retirés de"

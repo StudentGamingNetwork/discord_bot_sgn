@@ -25,10 +25,12 @@ mongoose
   .then(() => console.log("✅ Connecté à MongoDB"))
   .catch((err) => console.error("Erreur MongoDB:", err));
 
+console.log("[DEBUG] Lancement du bot Discord...");
 // Chargement dynamique des modules
 const modulesPath = path.join(__dirname, "modules");
 fs.readdirSync(modulesPath).forEach((file) => {
   if (file.endsWith(".ts") || file.endsWith(".js")) {
+    console.log(`[DEBUG] Chargement du module : ${file}`);
     require(path.join(modulesPath, file))(client);
   }
 });

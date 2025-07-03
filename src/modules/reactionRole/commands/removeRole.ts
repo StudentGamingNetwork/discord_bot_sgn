@@ -22,7 +22,13 @@ export async function handleRemoveRole(
   client: Client
 ) {
   const member = interaction.member as GuildMember;
+  console.log(
+    `[DEBUG][removeRole] Commande reçue par ${interaction.user.tag} (ID: ${interaction.user.id}) dans le salon ${interaction.channelId}`
+  );
   if (!isAuthorized(member)) {
+    console.warn(
+      `[DEBUG][removeRole] Permission refusée pour ${interaction.user.tag}`
+    );
     await interaction.reply({
       content: "⛔ Vous n'avez pas la permission.",
       flags: 64,
@@ -32,12 +38,14 @@ export async function handleRemoveRole(
   const role = interaction.options.getRole("role", true);
   const guildId = interaction.guildId!;
   const channelId = interaction.channelId;
+  console.log(`[DEBUG][removeRole] Paramètres reçus : role='${role.name}'`);
   const exists = await ReactionRole.findOne({
     guildId,
     channelId,
     roleId: role.id,
   });
   if (!exists) {
+    console.warn(`[DEBUG][removeRole] Rôle non trouvé dans la liste.`);
     await interaction.reply({
       content: "⛔ Ce rôle n'existe pas dans la liste.",
       flags: 64,
@@ -45,6 +53,7 @@ export async function handleRemoveRole(
     return;
   }
   await ReactionRole.deleteOne({ guildId, channelId, roleId: role.id });
+  console.log(`[DEBUG][removeRole] Rôle supprimé avec succès : ${role.name}`);
   await interaction.reply({
     content: `❌ Rôle retiré : ${role.name}`,
     flags: 64,
@@ -62,6 +71,9 @@ export async function handleRemoveRole(
       guildId,
       channel as TextChannel,
       interaction.guild!
+    );
+    console.log(
+      `[DEBUG][removeRole] Embed mis à jour dans le salon ${channel.id}`
     );
   }
 }

@@ -16,7 +16,13 @@ export async function handleWhitelistShow(
   client: Client
 ) {
   const member = interaction.member as GuildMember;
+  console.log(
+    `[DEBUG][whitelistShow] Commande reçue par ${interaction.user.tag} (ID: ${interaction.user.id}) dans le salon ${interaction.channelId}`
+  );
   if (!(await isAuthorized(member))) {
+    console.warn(
+      `[DEBUG][whitelistShow] Permission refusée pour ${interaction.user.tag}`
+    );
     await interaction.reply({
       content: "⛔ Vous n'avez pas la permission.",
       flags: 64,
@@ -29,6 +35,9 @@ export async function handleWhitelistShow(
     !whitelist ||
     (whitelist.userIds.length === 0 && whitelist.roleIds.length === 0)
   ) {
+    console.warn(
+      `[DEBUG][whitelistShow] Aucun utilisateur ou rôle whitelisté.`
+    );
     await interaction.reply({
       content: "Aucun utilisateur ou rôle n'est whitelisté.",
       flags: 64,
@@ -38,6 +47,9 @@ export async function handleWhitelistShow(
   const users = whitelist.userIds.map((id) => `<@${id}>`).join(", ") || "Aucun";
   const roles =
     whitelist.roleIds.map((id) => `<@&${id}>`).join(", ") || "Aucun";
+  console.log(
+    `[DEBUG][whitelistShow] Utilisateurs : ${users} | Rôles : ${roles}`
+  );
   await interaction.reply({
     content: `**Utilisateurs whitelistés :**\n${users}\n**Rôles whitelistés :**\n${roles}`,
     flags: 64,
