@@ -18,7 +18,17 @@ export async function buildReactionRoleEmbed(
   for (const role of roles) {
     const guildRole = guild.roles.cache.get(role.roleId);
     const roleName = guildRole ? guildRole.name : "Rôle inconnu";
-    let value = `${role.emoji} - ${roleName}`;
+    let emojiDisplay = role.emoji;
+    // Si c'est un id d'emoji custom (suite de chiffres)
+    if (/^\d{15,}$/.test(role.emoji)) {
+      const customEmoji = guild.emojis.cache.get(role.emoji);
+      if (customEmoji) {
+        emojiDisplay = `<${customEmoji.animated ? "a" : ""}:${
+          customEmoji.name
+        }:${customEmoji.id}>`;
+      }
+    }
+    let value = `${emojiDisplay} - ${roleName}`;
     if (role.description && role.description.trim() !== "") {
       value += ` : ${role.description}`;
     }
