@@ -39,34 +39,84 @@ export = (client: Client) => {
   // Gestion des réactions pour assigner/retirer les rôles
   client.on(Events.MessageReactionAdd, async (reaction, user, _details) => {
     if (user.bot) return;
-    // Gérer les partials
-    if (reaction.partial) await reaction.fetch();
-    if (user.partial) await user.fetch();
-    const member = await reaction.message.guild?.members.fetch(user.id);
-    if (!member) return;
-    const rr = await ReactionRole.findOne({
-      guildId: reaction.message.guildId,
-      messageId: reaction.message.id,
-      emoji: reaction.emoji.name,
-    });
-    if (rr) {
-      await member.roles.add(rr.roleId);
+    try {
+      // Gérer les partials
+      if (reaction.partial) await reaction.fetch();
+      if (user.partial) await user.fetch();
+      console.log(
+        `[DEBUG][ReactionAdd] Réaction détectée : messageId=${reaction.message.id}, emoji=${reaction.emoji.name}, user=${user.tag}`
+      );
+      const member = await reaction.message.guild?.members.fetch(user.id);
+      if (!member) {
+        console.warn(
+          `[DEBUG][ReactionAdd] Membre non trouvé pour userId=${user.id}`
+        );
+        return;
+      }
+      const rr = await ReactionRole.findOne({
+        guildId: reaction.message.guildId,
+        messageId: reaction.message.id,
+        emoji: reaction.emoji.name,
+      });
+      if (rr) {
+        try {
+          await member.roles.add(rr.roleId);
+          console.log(
+            `[DEBUG][ReactionAdd] Rôle attribué : roleId=${rr.roleId} à user=${user.tag}`
+          );
+        } catch (err) {
+          console.warn(
+            `[DEBUG][ReactionAdd] Échec de l'attribution du rôle : roleId=${rr.roleId} à user=${user.tag} - Erreur: ${err}`
+          );
+        }
+      } else {
+        console.log(
+          `[DEBUG][ReactionAdd] Aucun rôle configuré pour ce message/emoji.`
+        );
+      }
+    } catch (err) {
+      console.warn(`[DEBUG][ReactionAdd] Erreur inattendue: ${err}`);
     }
   });
 
   client.on(Events.MessageReactionRemove, async (reaction, user, _details) => {
     if (user.bot) return;
-    if (reaction.partial) await reaction.fetch();
-    if (user.partial) await user.fetch();
-    const member = await reaction.message.guild?.members.fetch(user.id);
-    if (!member) return;
-    const rr = await ReactionRole.findOne({
-      guildId: reaction.message.guildId,
-      messageId: reaction.message.id,
-      emoji: reaction.emoji.name,
-    });
-    if (rr) {
-      await member.roles.remove(rr.roleId);
+    try {
+      if (reaction.partial) await reaction.fetch();
+      if (user.partial) await user.fetch();
+      console.log(
+        `[DEBUG][ReactionRemove] Réaction retirée : messageId=${reaction.message.id}, emoji=${reaction.emoji.name}, user=${user.tag}`
+      );
+      const member = await reaction.message.guild?.members.fetch(user.id);
+      if (!member) {
+        console.warn(
+          `[DEBUG][ReactionRemove] Membre non trouvé pour userId=${user.id}`
+        );
+        return;
+      }
+      const rr = await ReactionRole.findOne({
+        guildId: reaction.message.guildId,
+        messageId: reaction.message.id,
+        emoji: reaction.emoji.name,
+      });
+      if (rr) {
+        try {
+          await member.roles.remove(rr.roleId);
+          console.log(
+            `[DEBUG][ReactionRemove] Rôle retiré : roleId=${rr.roleId} à user=${user.tag}`
+          );
+        } catch (err) {
+          console.warn(
+            `[DEBUG][ReactionRemove] Échec du retrait du rôle : roleId=${rr.roleId} à user=${user.tag} - Erreur: ${err}`
+          );
+        }
+      } else {
+        console.log(
+          `[DEBUG][ReactionRemove] Aucun rôle configuré pour ce message/emoji.`
+        );
+      }
+    } catch (err) {
+      console.warn(`[DEBUG][ReactionRemove] Erreur inattendue: ${err}`);
     }
   });
 };
